@@ -18,7 +18,7 @@ def food_snake():
         position=(random.randrange(COLS)),(random.randrange(ROWS))
         if position not in snake:
             return position
-food_real=food_snake
+food=food_snake()
 running=True
 
 while running:
@@ -32,7 +32,7 @@ while running:
                 direction=(0,1)
             elif event.key==pygame.K_LEFT and direction!=(1,0):
                 direction=(-1,0)
-            elif event.key==pygame.K_UP and direction!=(-1,0):
+            elif event.key==pygame.K_RIGHT and direction!=(-1,0):
                 direction=(1,0)
     snk_x,snk_y=snake[0]
     dir_x,dir_y= direction
@@ -47,17 +47,18 @@ while running:
         snake.insert(0,moved_snake)
         if moved_snake==food:
             score+=1
-            food= random.food()
+            food= food_snake()
         else:
             snake.pop()
+    screen.fill((20,20,20))
 
     for x,y in snake:
         pygame.draw.rect(screen,(0,200,80), (x*CELL,y*CELL,CELL-1,CELL-1))
-        pygame.draw.rect(screen, (220, 50, 50), (food[0] * CELL, food[1] * CELL, CELL - 1, CELL - 1))
-    text=font.render(f"score{score}",True,[255,255,255])
-    screen.blit(text(8,8))
+    pygame.draw.rect(screen, (220, 50, 50), (food[0] * CELL, food[1] * CELL, CELL - 1, CELL - 1))
+    text=font.render(f"score:{score}",True,[255,255,255])
+    screen.blit(text,(8,8))
     pygame.display.flip()
-    clock.tick(10)
-pygame.quit
+    clock.tick(2)
+pygame.quit()
                 
 
