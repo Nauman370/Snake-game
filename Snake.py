@@ -20,19 +20,34 @@ def food_snake():
             return position
 food=food_snake()
 running=True
+def draw_background():
+    for col in range(COLS):
+        for row in range(ROWS):
+            if (col+row)%2==0:
+                color=(120,200,90)
+            else:
+                color=(105,185,80)
+            pygame.draw.rect(screen,color,(col*CELL,row*CELL,CELL,CELL))
+fx=food[0]*CELL+CELL//2
+fy=food[1]*CELL+CELL//2
+pygame.draw.circle(screen,(210,30,30),(fx,fy),CELL//2-2)
+pygame.draw.circle(screen,(255, 140, 140),(fx-3,fy-3),2)
+pygame.draw.rect(screen,(90, 60, 30),(fx-1,fy-CELL//2,2,4))
+pygame.draw.rect(screen,(30, 140, 40),(fx+1,fy-CELL//2,6,4))
+
 
 while running:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             running=False
         if event.type==pygame.KEYDOWN:
-            if event.key==pygame.K_UP and direction!=(0,1):
+            if event.key in (pygame.K_UP ,pygame.K_w) and direction!=(0,1):
                 direction=(0,-1)
-            elif event.key==pygame.K_DOWN and direction!=(0,-1):
+            elif event.key in (pygame.K_DOWN , pygame.K_s) and direction!=(0,-1):
                 direction=(0,1)
-            elif event.key==pygame.K_LEFT and direction!=(1,0):
+            elif event.key in (pygame.K_LEFT , pygame.K_a)and direction!=(1,0):
                 direction=(-1,0)
-            elif event.key==pygame.K_RIGHT and direction!=(-1,0):
+            elif event.key in (pygame.K_RIGHT , pygame.K_d) and direction!=(-1,0):
                 direction=(1,0)
     snk_x,snk_y=snake[0]
     dir_x,dir_y= direction
@@ -50,15 +65,29 @@ while running:
             food= food_snake()
         else:
             snake.pop()
-    screen.fill((20,20,20))
+    draw_background()
 
-    for x,y in snake:
-        pygame.draw.rect(screen,(0,200,80), (x*CELL,y*CELL,CELL-1,CELL-1))
-    pygame.draw.rect(screen, (220, 50, 50), (food[0] * CELL, food[1] * CELL, CELL - 1, CELL - 1))
-    text=font.render(f"score:{score}",True,[255,255,255])
+
+    for i,(x,y) in enumerate(snake):
+        if i==0:
+            color=(30,90,200)
+        else:
+            color=(50,130,230)
+        pygame.draw.rect(screen,color,(x*CELL+1,y*CELL+1,CELL-2,CELL-2),border_radius=3)
+    fx=food[0]*CELL+CELL//2
+    fy=food[1]*CELL+CELL//2
+    pygame.draw.circle(screen,(210,30,30),(fx,fy),CELL//2-2)
+    pygame.draw.circle(screen,(255, 140, 140),(fx-3,fy-3),2)
+    pygame.draw.rect(screen,(90, 60, 30),(fx-1,fy-CELL//2,2,4))
+    pygame.draw.rect(screen,(30, 140, 40),(fx+1,fy-CELL//2,6,4))
+
+
+
+    text=font.render(f"score{score}",True,(255,255,255))
     screen.blit(text,(8,8))
     pygame.display.flip()
-    clock.tick(2)
+    clock.tick(8)
 pygame.quit()
+
                 
 
