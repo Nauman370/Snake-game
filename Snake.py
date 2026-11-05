@@ -35,12 +35,13 @@ def reset_game():
     global snake,score,direction,food,state
     snake=[(10,10),(10,9),(10,8)]
     direction=(1,0)
+    direction_queue.clear()
     score=0
     food=food_snake()
     state="playing"
 
-restart_btn=pygame.Rect(80, 230, 340, 40)
-quit_btn=pygame.Rect(80,285,340,40)
+restart_btn=pygame.Rect(80, 230, 240, 40)
+quit_btn=pygame.Rect(80,285,240,40)
 
 def draw_button(rect,label):
     mouse=pygame.mouse.get_pos()
@@ -68,6 +69,12 @@ while running:
             if event.key==pygame.K_ESCAPE:
                 running=False
             if state=="playing":
+                if event.key in Key_Dir:
+                    new_dir=Key_Dir[event.key]
+                last=direction_queue[-1] if direction_queue else direction
+                if new_dir !=(-last[0],-last[1]) and len(direction_queue)<2:
+                    direction_queue.append(new_dir)
+
 
             elif state=="gameover":
                 if event.key==pygame.K_RETURN:
@@ -79,6 +86,8 @@ while running:
                 running=False
     
     if state=="playing":
+        if direction_queue:
+            direction=direction_queue.pop(0)
 
         snk_x,snk_y=snake[0]
         dir_x,dir_y= direction
