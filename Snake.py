@@ -2,9 +2,10 @@ import pygame
 import random
 
 pygame.init()
-CELL=20
+
+CELL=ROWS=20
 COLS,ROWS=20,20
-screen=pygame.display.set_mode((COLS*CELL,ROWS*CELL))
+screen=pygame.display.set_mode((COLS*CELL,ROWS*CELL),pygame.SCALED|pygame.RESIZABLE)
 pygame.display.set_caption("Snake Game")
 clock=pygame.time.Clock()
 font=pygame.font.SysFont(None,28)
@@ -60,7 +61,7 @@ Key_Dir={
 
 
 
-
+stripe_phase=0
 while running:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
@@ -71,9 +72,11 @@ while running:
             if state=="playing":
                 if event.key in Key_Dir:
                     new_dir=Key_Dir[event.key]
-                last=direction_queue[-1] if direction_queue else direction
-                if new_dir !=(-last[0],-last[1]) and len(direction_queue)<2:
-                    direction_queue.append(new_dir)
+                    last=direction_queue[-1] if direction_queue else direction
+                    if new_dir !=(-last[0],-last[1]) and len(direction_queue)<2:
+                        direction_queue.append(new_dir)
+            if event.type==pygame.K_f:
+                pygame.toggle.display.fullscreen
 
 
             elif state=="gameover":
@@ -107,6 +110,9 @@ while running:
             else:
                 snake.pop()
     draw_background()
+    if state=="playing":
+        stripe_phase=(stripe_phase+4)%CELL
+    
 
 
     for i,(x,y) in enumerate(snake):
@@ -117,6 +123,17 @@ while running:
         else:
             color=(35,105,235)
         pygame.draw.rect(screen,color,(x*CELL+1,y*CELL+1,CELL-2,CELL-2),border_radius=3)
+        if i>0:
+            prev_x,prev_y=snake[i-1]
+            stripe=[200,42,129]
+            p=max(1,stripe_phase)
+            w=min(3,CELL-1-p)
+            if w>0:
+
+                if prev_y==y:
+                    pygame.draw.rect(screen,stripe,(x*CELL+p,y*CELL+4,w,CELL-8))
+                else:
+                    pygame.draw.rect(screen,stripe,(x*CELL+4,y*CELL+p,CELL-8,w))
     fx=food[0]*CELL+CELL//2
     fy=food[1]*CELL+CELL//2
     pygame.draw.circle(screen,(210,30,30),(fx,fy),CELL//2-2)
@@ -138,5 +155,5 @@ while running:
         draw_button(restart_btn,"Press Enter to Restart")
         draw_button(quit_btn,"Press ESC to exit")
     pygame.display.flip()
-    clock.tick(8)
+    clock.tick(15)
 pygame.quit()
