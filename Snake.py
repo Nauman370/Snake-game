@@ -38,9 +38,9 @@ PRESETS={
     "EZ_PZ":("slow","small"),
     "EZ":("normal_s","small"),
     "normal":("normal_s","normal_g"),
-    "abnormal":("fast","normal_g"),
-    "HELP":("faster","big"),
-    "NUH Uh":("fastest","biggest")
+    "abnormal":("fastest","normal_g"),
+    "HELP":("faster","small"),
+    "NUH Uh":("fastest","small")
 }
 sel_speed="normal_s"
 sel_grid="normal_g"
@@ -146,19 +146,30 @@ while running:
             elif state=="gameover":
                 if event.key==pygame.K_RETURN:
                     reset_game()
-                elif event.key==pygame.K_M:
+                elif event.key==pygame.K_m:
                     state="menu"
         if event.type==pygame.MOUSEBUTTONDOWN :
             if state=="menu":
                 for label,rect in preset_btns:
                     if rect.collidepoint(event.pos):
-                        start_game(PRESETS[label])
+                        start_game(*PRESETS[label])
+                for label,rect in speed_btns:
+                    if rect.collidepoint(event.pos):
+                        sel_speed=label
                 for label,rect in grid_btns:
-                    if rect.collidepoint(event.pos)
-            if restart_btn.collidepoint(event.pos):
-                reset_game()
-            elif quit_btn.collidepoint(event.pos):
-                running=False
+                    if rect.collidepoint(event.pos):
+                        sel_grid=label
+                if start_btn.collidepoint(event.pos):
+                    start_game(sel_speed,sel_grid)
+            elif state=="gameover":
+
+            
+                if restart_btn.collidepoint(event.pos):
+                    reset_game()
+                elif menu_btn.collidepoint(event.pos):
+                    state="menu"
+                elif quit_btn.collidepoint(event.pos):
+                    running=False
     
     if state=="playing":
         if direction_queue:
@@ -224,14 +235,19 @@ while running:
     text=font.render(f"score:{score}",True,(255,255,255))
     screen.blit(text,(8,8))
     if state=="gameover":
-        overlay=pygame.Surface((COLS*CELL,ROWS*CELL))
+        overlay=pygame.Surface((WINDOW,WINDOW))
         overlay.set_alpha(160)
         overlay.fill((0,0,0))
         screen.blit(overlay,(0,0))
+        draw_text("Game Over",220,big_font)
+        draw_text(f"Score:{score}",270)
+        draw_button(restart_btn,"Restart,(Press enter)")
+        draw_button(menu_btn,"Menu,(Press M to open M)")
+        draw_button(quit_btn,"Quit,(Press ESC to exit)")
         title=big_font.render("Game Over",True,(255,255,255))
         screen.blit(title,title.get_rect(center=(COLS*CELL//2,175)))
         draw_button(restart_btn,"Press Enter to Restart")
         draw_button(quit_btn,"Press ESC to exit")
     pygame.display.flip()
-    clock.tick(15)
+    clock.tick(fps)
 pygame.quit()
