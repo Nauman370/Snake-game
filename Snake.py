@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 pygame.init()
 WINDOW=600
@@ -45,6 +46,44 @@ PRESETS={
 sel_speed="normal_s"
 sel_grid="normal_g"
 big_font=pygame.font.SysFont(None,56)
+tongue_Duration=450
+tongue_next=pygame.time.get_ticks()+random.randint(1500,4000)
+def draw_tongue():
+    global tongue_next
+    rn=pygame.time.get_ticks()
+    if rn<tongue_next:
+        return
+    t=(rn-tongue_next)/tongue_Duration
+    if t>=1:
+        tongue_next=(rn+random.randint(1500,4000))
+        return
+    hx,hy=snake[0]
+    dx,dy=direction
+    px,py=-dy,dx
+    ext=math.sin(t*math.pi)
+    length=CELL*1.1*ext
+
+    start=(hx*CELL+CELL//2+dx*CELL//2,hy*CELL+CELL//2+dy*CELL//2)
+    width=max(2,CELL//8)
+    color=(220,40,70)
+
+    points=[]
+    steps=8
+    for i in range(steps+1):
+        f=i/steps
+        jiggle=math.sin(f*math.pi*2+t*math.pi*6)*CELL*0.15*f
+        points.append((start[0]+dx*length*f+px*jiggle,
+               start[1]+dy*length*f+py*jiggle))
+    pygame.draw.lines(screen,color,False,points,width)
+
+    tip=points[-1]
+    prong=CELL*0.3*ext
+    for s in (-1,1):
+        end=(tip[0]+dx*prong+px*prong*s, tip[1]+dy*prong+py*prong*s)
+        pygame.draw.line(screen,color,tip,end,width)
+
+    
+
 
 def reset_game():
     global snake,score,direction,food,state
@@ -241,6 +280,8 @@ while running:
                     pygame.draw.rect(screen,stripe,(x*CELL+p,y*CELL+4,w,CELL-8))
                 else:
                     pygame.draw.rect(screen,stripe,(x*CELL+4,y*CELL+p,CELL-8,w))
+    if state=="playing":
+        draw_tongue()
     fx=food[0]*CELL+CELL//2
     fy=food[1]*CELL+CELL//2
     pygame.draw.circle(screen,(210,30,30),(fx,fy),CELL//2-2)
