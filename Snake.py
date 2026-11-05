@@ -4,7 +4,7 @@ import random
 pygame.init()
 WINDOW=600
 COLS=ROWS=20
-CELL=COL//ROW
+CELL=WINDOW//COLS
 fps=10
 screen=pygame.display.set_mode((WINDOW,WINDOW),pygame.SCALED|pygame.RESIZABLE)
 pygame.display.set_caption("Snake Game")
@@ -34,7 +34,7 @@ state="menu"
 SPEEDS={"slow":8,"normal_s":10,"fast":14,"faster":18,"fastest":22}
 GRIDS={"small":18,"normal_g":24,"big":30,"bigger":36,"biggest":40}
 PRESETS={
-    "Easiest":("slow":"biggest"),
+    "Easiest":("slow","biggest"),
     "EZ_PZ":("slow","small"),
     "EZ":("normal_s","small"),
     "normal":("normal_s","normal_g"),
@@ -48,17 +48,55 @@ big_font=pygame.font.SysFont(None,56)
 
 def reset_game():
     global snake,score,direction,food,state
-    snake=[(10,10),(10,9),(10,8)]
+    mid=COLS//2
+    snake=[(mid,mid),(mid-1,mid),(mid-2,mid)]
     direction=(1,0)
     direction_queue.clear()
     score=0
     food=food_snake()
     state="playing"
 
-restart_btn=pygame.Rect(80, 230, 240, 40)
-quit_btn=pygame.Rect(80,285,240,40)
 
-def draw_button(rect,label):
+def start_game(speed_name,grid_name):
+    global COLS,ROWS,CELL,fps
+    COLS=ROWS=GRIDS[grid_name]
+    CELL=WINDOW//COLS
+    fps=SPEEDS[speed_name]
+    reset_game()
+
+def make_row(labels,y,w,gap):
+    total=len(labels)*w+(len(labels)-1)*gap
+    x=(WINDOW-total)//2
+    row=[]
+    for label in labels:
+        row.append((label,pygame.Rect(x,y,w,40)))
+        x+=w+gap
+    return row
+def draw_text(msg,y,f=font):
+    img=f.render(msg,True,(255,255,255))
+    screen.blit(img,img.get_rect(center=(WINDOW//2,y)))
+def draw_button(rect,label,selected=False):
+    mouse=pygame.mouse.get_pos()
+    if selected:
+        color=(200,150,30)
+    elif rect.collidepoint(mouse):
+        color=(70,160,70)
+    else:
+        color=(40,120,40)
+    pygame.draw.rect(screen,color,rect,border_radius=8)
+    text=font.render(label,True,(255,255,255))
+    screen.blit(text,text.get_rect(center=rect.center))
+names=list(PRESETS)
+preset_row1=make_row(names[:4],110,130,10)
+preset_row2=make_row(names[4:],155,130,10)
+preset_btns=preset_row1+preset_row2
+speed_btns=make_row(list(SPEEDS),245,100,10)
+grid_btns=make_row(list(GRIDS),340,105,8)
+start_btn=pygame.Rect(WINDOW//2-120,430,240,44)
+restart_btn=pygame.Rect(WINDOW//2-150,310,300,44)
+menu_btn=pygame.Rect(WINDOW//2-150,365,300,44)
+quit_btn=pygame.Rect(WINDOW//2-150,420,300,44)
+def draw_button(rect,label,selected=False):
     mouse=pygame.mouse.get_pos()
     color=(70,160,70) if rect.collidepoint(mouse) else(40,120,40)
     pygame.draw.rect(screen,color,rect,border_radius=8)
@@ -72,6 +110,19 @@ Key_Dir={
     pygame.K_LEFT:(-1,0),pygame.K_a:(-1,0),
     pygame.K_RIGHT:(1,0),pygame.K_d:(1,0),
 }
+def draw_menu():
+    screen.fill((30,60,30))
+    draw_text("SNAKE",50,big_font)
+    draw_text("Presets",90)
+    for label,rect in preset_btns:
+        draw_button(rect,label)
+    draw_text("Custom:Choose Speed",220)
+    for label,rect in speed_btns:
+        draw_button(rect,label,label==sel_speed)
+    draw_text("Custom:Choose grid",315)
+    for label, rect in grid_btns:
+        draw_button(rect,label,label==sel_grid)
+    draw_button(start_btn,"Start Custom")
 
 
 
@@ -83,20 +134,27 @@ while running:
         if event.type==pygame.KEYDOWN:
             if event.key==pygame.K_ESCAPE:
                 running=False
+
+            if event.key ==(pygame.K_F11):
+                pygame.display.toggle_fullscreen()
             if state=="playing":
                 if event.key in Key_Dir:
                     new_dir=Key_Dir[event.key]
                     last=direction_queue[-1] if direction_queue else direction
                     if new_dir !=(-last[0],-last[1]) and len(direction_queue)<2:
                         direction_queue.append(new_dir)
-            if event.type==pygame.K_f:
-                pygame.toggle.display.fullscreen
-
-
             elif state=="gameover":
                 if event.key==pygame.K_RETURN:
                     reset_game()
-        if event.type==pygame.MOUSEBUTTONDOWN and state=="gameover":
+                elif event.key==pygame.K_M:
+                    state="menu"
+        if event.type==pygame.MOUSEBUTTONDOWN :
+            if state=="menu":
+                for label,rect in preset_btns:
+                    if rect.collidepoint(event.pos):
+                        start_game(PRESETS[label])
+                for label,rect in grid_btns:
+                    if rect.collidepoint(event.pos)
             if restart_btn.collidepoint(event.pos):
                 reset_game()
             elif quit_btn.collidepoint(event.pos):
@@ -123,6 +181,12 @@ while running:
                 food= food_snake()
             else:
                 snake.pop()
+    if state=="menu":
+        draw_menu()
+        pygame.display.flip()
+        clock.tick(30)
+        continue
+
     draw_background()
     if state=="playing":
         stripe_phase=(stripe_phase+4)%CELL
