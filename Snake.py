@@ -31,9 +31,19 @@ def draw_background():
                 color=(105,185,80)
             pygame.draw.rect(screen,color,(col*CELL,row*CELL,CELL,CELL))
 state="menu"
-SPEEDS={"slow":8,"normal":10,"fast":14,"faster":18,"fastest":22}
-GRIDS={"small":18,"normal":24,"big":30,"bigger":36,"biggest":40}
-PRESETS=
+SPEEDS={"slow":8,"normal_s":10,"fast":14,"faster":18,"fastest":22}
+GRIDS={"small":18,"normal_g":24,"big":30,"bigger":36,"biggest":40}
+PRESETS={
+    "Easiest":("slow":"biggest"),
+    "EZ_PZ":("slow","small"),
+    "EZ":("normal_s","small"),
+    "normal":("normal_s","normal_g"),
+    "abnormal":("fast","normal_g"),
+    "HELP":("faster","big"),
+    "NUH Uh":("fastest","biggest")
+}
+sel_speed="normal_s"
+sel_grid="normal_g"
 big_font=pygame.font.SysFont(None,56)
 
 def reset_game():
