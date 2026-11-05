@@ -96,12 +96,6 @@ start_btn=pygame.Rect(WINDOW//2-120,430,240,44)
 restart_btn=pygame.Rect(WINDOW//2-150,310,300,44)
 menu_btn=pygame.Rect(WINDOW//2-150,365,300,44)
 quit_btn=pygame.Rect(WINDOW//2-150,420,300,44)
-def draw_button(rect,label,selected=False):
-    mouse=pygame.mouse.get_pos()
-    color=(70,160,70) if rect.collidepoint(mouse) else(40,120,40)
-    pygame.draw.rect(screen,color,rect,border_radius=8)
-    text=font.render(label,True,(255,255,255))
-    screen.blit(text,text.get_rect(center=rect.center))
 direction_queue=[]
 
 Key_Dir={
@@ -131,29 +125,53 @@ while running:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             running=False
-        if event.type==pygame.KEYDOWN:
+
+        elif event.type==pygame.KEYDOWN:
             if event.key==pygame.K_ESCAPE:
                 running=False
-
-            if event.key ==(pygame.K_F11):
+            elif event.key==pygame.K_F11:
                 pygame.display.toggle_fullscreen()
-            if state=="playing":
-                if event.key in Key_Dir:
-                    new_dir=Key_Dir[event.key]
-                    last=direction_queue[-1] if direction_queue else direction
-                    if new_dir !=(-last[0],-last[1]) and len(direction_queue)<2:
-                        direction_queue.append(new_dir)
+            elif event.key==pygame.K_p:
+                if state=="playing":
+                    state="paused"
+                elif state=="paused":
+                    state="playing"
+            elif state=="playing" and event.key in Key_Dir:
+                new_dir=Key_Dir[event.key]
+                last=direction_queue[-1] if direction_queue else direction
+                if new_dir!=(-last[0],-last[1]) and len(direction_queue)<2:
+                    direction_queue.append(new_dir)
             elif state=="gameover":
                 if event.key==pygame.K_RETURN:
                     reset_game()
                 elif event.key==pygame.K_m:
                     state="menu"
-        if event.type==pygame.MOUSEBUTTONDOWN :
+            elif state=="paused" and event.key==pygame.K_m:
+                state="menu"
+
+        elif event.type==pygame.MOUSEBUTTONDOWN and event.button==1:
             if state=="menu":
                 for label,rect in preset_btns:
                     if rect.collidepoint(event.pos):
                         start_game(*PRESETS[label])
-                for label,rect in speed_btns:
+                        break
+                else:
+                    for label,rect in speed_btns:
+                        if rect.collidepoint(event.pos):
+                            sel_speed=label
+                    for label,rect in grid_btns:
+                        if rect.collidepoint(event.pos):
+                            sel_grid=label
+                    if start_btn.collidepoint(event.pos):
+                        start_game(sel_speed,sel_grid)
+            elif state=="gameover":
+                if restart_btn.collidepoint(event.pos):
+                    reset_game()
+                elif menu_btn.collidepoint(event.pos):
+                    state="menu"
+                elif quit_btn.collidepoint(event.pos):
+                    running=False
+
                     if rect.collidepoint(event.pos):
                         sel_speed=label
                 for label,rect in grid_btns:
@@ -248,6 +266,14 @@ while running:
         screen.blit(title,title.get_rect(center=(COLS*CELL//2,175)))
         draw_button(restart_btn,"Press Enter to Restart")
         draw_button(quit_btn,"Press ESC to exit")
+    if state=="paused":
+        overlay=pygame.Surface((WINDOW,WINDOW))
+        overlay.set_alpha(120)
+        overlay.fill((0,0,0))
+        screen.blit(overlay,(0,0))
+        draw_text("Paused",260,big_font)
+        draw_text("press P to resume/pause",310)
+        draw_text("press M to go to Menu",345)
     pygame.display.flip()
     clock.tick(fps)
 pygame.quit()
