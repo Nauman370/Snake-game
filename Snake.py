@@ -2,10 +2,11 @@ import pygame
 import random
 
 pygame.init()
-
-CELL=ROWS=20
-COLS,ROWS=20,20
-screen=pygame.display.set_mode((COLS*CELL,ROWS*CELL),pygame.SCALED|pygame.RESIZABLE)
+WINDOW=600
+COLS=ROWS=20
+CELL=COL//ROW
+fps=10
+screen=pygame.display.set_mode((WINDOW,WINDOW),pygame.SCALED|pygame.RESIZABLE)
 pygame.display.set_caption("Snake Game")
 clock=pygame.time.Clock()
 font=pygame.font.SysFont(None,28)
@@ -29,7 +30,10 @@ def draw_background():
             else:
                 color=(105,185,80)
             pygame.draw.rect(screen,color,(col*CELL,row*CELL,CELL,CELL))
-state="playing"
+state="menu"
+SPEEDS={"slow":8,"normal":10,"fast":14,"faster":18,"fastest":22}
+GRIDS={"small":18,"normal":24,"big":30,"bigger":36,"biggest":40}
+PRESETS=
 big_font=pygame.font.SysFont(None,56)
 
 def reset_game():
