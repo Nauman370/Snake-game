@@ -262,8 +262,8 @@ while running:
                     state="menu"
                 elif event.key==pygame.K_h:
                     show_controls=not show_controls
-                elif state=="paused" and event.key==pygame.K_m:
-                    state="menu"
+            elif state=="paused" and event.key==pygame.K_m:
+                state="menu"
 
         elif event.type==pygame.MOUSEBUTTONDOWN and event.button==1:
             if state=="menu":
@@ -283,12 +283,6 @@ while running:
                     if wrap_btn.collidepoint(event.pos):
                         sel_wrap=not sel_wrap
             elif state=="gameover":
-                if restart_btn.collidepoint(event.pos):
-                    reset_game()
-                elif menu_btn.collidepoint(event.pos):
-                    state="menu"
-                elif quit_btn.collidepoint(event.pos):
-                    running=False
                 if restart_btn.collidepoint(event.pos):
                     reset_game()
                 elif menu_btn.collidepoint(event.pos):
