@@ -113,6 +113,8 @@ def draw_bonus():
         shape=[(bx*CELL+int(u*CELL),by*CELL+int(v*CELL)) for u,v in pts]
         pygame.draw.polygon(screen,(240,220,60),shape)
         pygame.draw.polygon(screen,(150,120,20),shape,1)
+        for u,v in((0.1,0.2),(0.97,0.2)):
+            pygame.draw.circle(screen,(110,80,30),(bx*CELL+int(u*CELL),by*CELL+int(v*CELL)),max(1,CELL//10))
     
 
 
@@ -301,6 +303,11 @@ while running:
         else:
             color=(35,105,235)
         pygame.draw.rect(screen,color,(x*CELL+1,y*CELL+1,CELL-2,CELL-2),border_radius=3)
+        if i==0:
+            ax,ay=direction
+            cx=x*CELL+CELL//2
+            cy=y*CELL+CELL//2
+            qx,qy=
         if i>0:
             prev_x,prev_y=snake[i-1]
             stripe=[200,42,129]
