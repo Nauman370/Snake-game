@@ -59,11 +59,18 @@ controls_font=pygame.font.SysFont(None,23)
 show_controls=True
 Snakes_colors={
     "blue":{"head":(30,90,120),"a":(50,130,230),"b":(35,105,245), "accent":(200,42,129)},
-    "green":{"head":(),"a":(),"b":(),"accent":()},
-    "purple":{"head":(),"a":(),"b":(),"accent":()},
-    "black":{"head":(),"a":(),"b":(),"accent":()},
-    "golden":{"head":(),"a"()}
-    "red":
+    "green":{"head":(20, 120, 50),"a":(40, 170, 70),"b":(30, 145, 60),"accent":(250, 230, 80)},
+    "purple":{"head":(100, 40, 160),"a":(140, 80, 200),"b":(120, 60, 180),"accent":(255, 200, 80)},
+    "red":{"head":(170, 30, 40),"a":(220, 60, 70),"b":(195, 45, 55),"accent":(255, 230, 120)},
+    "golden":{"head":(200, 150, 20),"a":(240, 200, 60),"b":(220, 175, 40),"accent":()},
+    "black":{"head":(20, 20, 20),"a":(60,60,60),"b":(40,40,40),"accent":(230,60,60)}
+}
+Board_colors={
+    "grass":{""}
+    "desert":
+    "night":
+    "ice":
+    "candy":
 }
 tongue_Duration=450
 tongue_next=pygame.time.get_ticks()+random.randint(1500,4000)
