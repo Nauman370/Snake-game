@@ -16,11 +16,12 @@ font=pygame.font.SysFont(None,28)
 snake=[(10,10),(10,9),(10,8)]
 direction=(1,0)
 score=00
-Fruits={"banana":{"points":2},
-        "orange":{"points":3}}
+Fruits={"banana":{"points":2,"grow":2},
+        "orange":{"points":3,"grow":3}}
 bonus=None
 bonus_wait=60
 bonus_life=0
+grow_pending=0
 def food_snake():
     while True:
         position=(random.randrange(COLS)),(random.randrange(ROWS))
@@ -119,7 +120,8 @@ def draw_bonus():
 
 
 def reset_game():
-    global snake,score,direction,food,state,bonus,bonus_wait
+    global snake,score,direction,food,state,bonus,bonus_wait,grow_pending
+    grow_pending=0
     bonus=None
     bonus_wait=random.randint(3*fps,8*fps)
     mid=COLS//2
@@ -264,17 +266,19 @@ while running:
             state="gameover"
         else:
             snake.insert(0,moved_snake)
-            ate=False
             if moved_snake==food:
                 score+=1
                 food= food_snake()
-                ate=True
+                grow_pending+=1
             elif bonus is not None and moved_snake==bonus[0]:
                 score+=Fruits[bonus[1]]["points"]
+                grow_pending+=Fruits[bonus[1]]["grow"]
                 bonus=None
                 bonus_wait=random.randint(3*fps,8*fps)
-                ate=True
-            if not ate:
+            if grow_pending>0:
+                grow_pending-=1
+
+            else:
                 snake.pop()
         if bonus is None:
             bonus_wait-=1
