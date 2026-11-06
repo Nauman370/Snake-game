@@ -55,6 +55,16 @@ sel_grid="normal_g"
 wrap=False
 sel_wrap=False
 big_font=pygame.font.SysFont(None,56)
+controls_font=pygame.font.SysFont(None,23)
+show_controls=True
+Snakes_colors={
+    "blue":{"head":(30,90,120),"a":(50,130,230),"b":(35,105,245), "accent":(200,42,129)},
+    "green":{"head":(),"a":(),"b":(),"accent":()},
+    "purple":{"head":(),"a":(),"b":(),"accent":()},
+    "black":{"head":(),"a":(),"b":(),"accent":()},
+    "golden":{"head":(),"a"()}
+    "red":
+}
 tongue_Duration=450
 tongue_next=pygame.time.get_ticks()+random.randint(1500,4000)
 def draw_tongue():
@@ -154,6 +164,18 @@ def make_row(labels,y,w,gap):
 def draw_text(msg,y,f=font):
     img=f.render(msg,True,(255,255,255))
     screen.blit(img,img.get_rect(center=(WINDOW//2,y)))
+def draw_controls():
+    bar=pygame.Surface((WINDOW,46))
+    bar.set_alpha(110)
+    bar.fill((0,0,0))
+    screen.blit(bar,(0,WINDOW-46))
+    draw_text("Press WASD OR Use Arrows to move   P for Pause  To hide this press h",WINDOW-32,controls_font)
+    parts=[]
+    for name,info in Fruits.items():
+        parts.append(name.title()+"+"+str(info["points"]))
+    fruit_text="    ".join(parts)
+    draw_text(fruit_text,WINDOW-14,controls_font)
+
 def draw_button(rect,label,selected=False):
     mouse=pygame.mouse.get_pos()
     if selected:
@@ -217,6 +239,8 @@ while running:
                     state="paused"
                 elif state=="paused":
                     state="playing"
+            elif event.key==pygame.K_h:
+                show_controls=not show_controls
             elif state=="playing" and event.key in Key_Dir:
                 new_dir=Key_Dir[event.key]
                 last=direction_queue[-1] if direction_queue else direction
@@ -227,8 +251,10 @@ while running:
                     reset_game()
                 elif event.key==pygame.K_m:
                     state="menu"
-            elif state=="paused" and event.key==pygame.K_m:
-                state="menu"
+                elif event.key==pygame.K_h:
+                    show_controls=not show_controls
+                elif state=="paused" and event.key==pygame.K_m:
+                    state="menu"
 
         elif event.type==pygame.MOUSEBUTTONDOWN and event.button==1:
             if state=="menu":
@@ -350,6 +376,8 @@ while running:
     draw_bonus()
     text=font.render(f"score:{score}",True,(255,255,255))
     screen.blit(text,(8,8))
+    if show_controls and state in("playing","paused"):
+        draw_controls()
     if state=="gameover":
         overlay=pygame.Surface((WINDOW,WINDOW))
         overlay.set_alpha(160)
