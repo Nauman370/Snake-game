@@ -304,10 +304,16 @@ while running:
             color=(35,105,235)
         pygame.draw.rect(screen,color,(x*CELL+1,y*CELL+1,CELL-2,CELL-2),border_radius=3)
         if i==0:
-            ax,ay=direction
-            cx=x*CELL+CELL//2
-            cy=y*CELL+CELL//2
-            qx,qy=
+             
+             ax,ay=direction
+             cx=x*CELL+CELL//2
+             cy=y*CELL+CELL//2
+             qx,qy=-ay,ax
+             s=CELL*0.3
+             tip=(cx+ax*CELL*0.45,cy+ay*CELL*0.45)
+             back_a=(cx-ax*s+qx*s,cy-ay*s+qy*s)
+             back_b=(cx-ax*s-qx*s,cy-ay*s-qy*s)
+             pygame.draw.polygon(screen,(200,42,129),[tip,back_a,back_b])
         if i>0:
             prev_x,prev_y=snake[i-1]
             stripe=[200,42,129]
