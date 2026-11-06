@@ -62,16 +62,18 @@ Snakes_colors={
     "green":{"head":(20, 120, 50),"a":(40, 170, 70),"b":(30, 145, 60),"accent":(250, 230, 80)},
     "purple":{"head":(100, 40, 160),"a":(140, 80, 200),"b":(120, 60, 180),"accent":(255, 200, 80)},
     "red":{"head":(170, 30, 40),"a":(220, 60, 70),"b":(195, 45, 55),"accent":(255, 230, 120)},
-    "golden":{"head":(200, 150, 20),"a":(240, 200, 60),"b":(220, 175, 40),"accent":()},
+    "golden":{"head":(200, 150, 20),"a":(240, 200, 60),"b":(220, 175, 40),"accent":(90,50,10)},
     "black":{"head":(20, 20, 20),"a":(60,60,60),"b":(40,40,40),"accent":(230,60,60)}
 }
 Board_colors={
-    "grass":{""}
-    "desert":
-    "night":
-    "ice":
-    "candy":
+    "grass":{"light":(120, 200, 90),"dark":(105, 185, 80),"border":(20, 40, 20)},
+    "desert":{"light": (235, 215, 160), "dark": (220, 198, 140),"border":(70,50,30)},
+    "night":{"light": (50, 60, 90),    "dark": (40, 48, 75),"border":(15,18,30)},
+    "ice":{"light": (200, 230, 245), "dark": (180, 215, 235),"border":(40,70,90)},
+    "candy":{"light": (250, 200, 220), "dark": (240, 180, 205),"border":(90,40,60)},
 }
+sel_snake="green"
+sel_board="grass"
 tongue_Duration=450
 tongue_next=pygame.time.get_ticks()+random.randint(1500,4000)
 def draw_tongue():
