@@ -16,14 +16,20 @@ font=pygame.font.SysFont(None,28)
 snake=[(10,10),(10,9),(10,8)]
 direction=(1,0)
 score=00
+Fruits={"banana":{"points":2},
+        "orange":{"points":3}}
+bonus=None
+bonus_wait=60
+bonus_life=0
 def food_snake():
     while True:
         position=(random.randrange(COLS)),(random.randrange(ROWS))
-        if position not in snake:
+        if position not in snake and (bonus is None or position!=bonus[0]):
             return position
 food=food_snake()
 running=True
 def draw_background():
+    screen.fill((20,40,20))
     for col in range(COLS):
         for row in range(ROWS):
             if (col+row)%2==0:
@@ -73,7 +79,7 @@ def draw_tongue():
         f=i/steps
         jiggle=math.sin(f*math.pi*2+t*math.pi*6)*CELL*0.15*f
         points.append((start[0]+dx*length*f+px*jiggle,
-               start[1]+dy*length*f+py*jiggle))
+                       start[1]+dy*length*f+py*jiggle))
     pygame.draw.lines(screen,color,False,points,width)
 
     tip=points[-1]
@@ -82,11 +88,38 @@ def draw_tongue():
         end=(tip[0]+dx*prong+px*prong*s, tip[1]+dy*prong+py*prong*s)
         pygame.draw.line(screen,color,tip,end,width)
 
+
+def spawn_bonus():
+    kind=random.choice(list(Fruits))
+    while True:
+        pos=(random.randrange(COLS),random.randrange(ROWS))
+        if pos not in snake and pos!=food:
+            return pos,kind
+
+
+def draw_bonus():
+    if bonus is None:
+        return
+    (bx,by),kind=bonus
+    cx=bx*CELL+CELL//2
+    cy=by*CELL+CELL//2
+    if kind=="orange":
+        pygame.draw.circle(screen,(250,150,30),(cx,cy),CELL//2-2)
+        pygame.draw.circle(screen,(255,210,140),(cx-3,cy-3),2)
+        pygame.draw.ellipse(screen,(30,140,40),(cx,cy-CELL//2,6,4))
+    else:
+        pts=[(0.1,0.2),(0.3,0.5),(0.5,0.6),(0.7,0.5),(0.9,0.2),
+             (0.97,0.5),(0.75,0.85),(0.5,1.0),(0.25,0.85),(0.03,0.5)]
+        shape=[(bx*CELL+int(u*CELL),by*CELL+int(v*CELL)) for u,v in pts]
+        pygame.draw.polygon(screen,(240,220,60),shape)
+        pygame.draw.polygon(screen,(150,120,20),shape,1)
     
 
 
 def reset_game():
-    global snake,score,direction,food,state
+    global snake,score,direction,food,state,bonus,bonus_wait
+    bonus=None
+    bonus_wait=random.randint(3*fps,8*fps)
     mid=COLS//2
     snake=[(mid,mid),(mid-1,mid),(mid-2,mid)]
     direction=(1,0)
@@ -210,56 +243,55 @@ while running:
                     state="menu"
                 elif quit_btn.collidepoint(event.pos):
                     running=False
-
-                    if rect.collidepoint(event.pos):
-                        sel_speed=label
-                for label,rect in grid_btns:
-                    if rect.collidepoint(event.pos):
-                        sel_grid=label
-                if start_btn.collidepoint(event.pos):
-                    start_game(sel_speed,sel_grid)
-            elif state=="gameover":
-
-            
                 if restart_btn.collidepoint(event.pos):
                     reset_game()
                 elif menu_btn.collidepoint(event.pos):
                     state="menu"
                 elif quit_btn.collidepoint(event.pos):
                     running=False
-    
     if state=="playing":
         if direction_queue:
-            direction=direction_queue.pop(0)
-
+                direction=direction_queue.pop(0)
         snk_x,snk_y=snake[0]
         dir_x,dir_y= direction
         moved_snake=(snk_x+dir_x,snk_y+dir_y)
-
         hit_wall=not(0<=moved_snake[0]<COLS and 0 <=moved_snake[1]<ROWS)
         hit_self=moved_snake in snake
-
         if (hit_wall or hit_self) is True:
+            
             state="gameover"
-
         else:
             snake.insert(0,moved_snake)
+            ate=False
             if moved_snake==food:
                 score+=1
                 food= food_snake()
-            else:
+                ate=True
+            elif bonus is not None and moved_snake==bonus[0]:
+                score+=Fruits[bonus[1]]["points"]
+                bonus=None
+                bonus_wait=random.randint(3*fps,8*fps)
+                ate=True
+            if not ate:
                 snake.pop()
+        if bonus is None:
+            bonus_wait-=1
+            if bonus_wait<=0:
+                    bonus=spawn_bonus()
+                    bonus_life=6*fps
+        else:
+                bonus_life-=1
+                if bonus_life<=0:
+                    bonus=None
+                    bonus_wait=random.randint(3*fps,8*fps)
     if state=="menu":
         draw_menu()
         pygame.display.flip()
         clock.tick(30)
         continue
-
     draw_background()
     if state=="playing":
         stripe_phase=(stripe_phase+4)%CELL
-    
-
 
     for i,(x,y) in enumerate(snake):
         if i==0:
@@ -288,9 +320,7 @@ while running:
     pygame.draw.circle(screen,(255, 140, 140),(fx-3,fy-3),2)
     pygame.draw.ellipse(screen,(90, 60, 30),(fx-1,fy-CELL//2,2,4))
     pygame.draw.rect(screen,(30, 140, 40),(fx+1,fy-CELL//2,6,4))
-
-
-
+    draw_bonus()
     text=font.render(f"score:{score}",True,(255,255,255))
     screen.blit(text,(8,8))
     if state=="gameover":
@@ -299,11 +329,11 @@ while running:
         overlay.fill((0,0,0))
         screen.blit(overlay,(0,0))
         draw_text(f"Score:{score}",270)
-        draw_button(restart_btn,"Restart,(Press enter)")
-        draw_button(menu_btn,"Menu,(Press M to open M)")
-        draw_button(quit_btn,"Quit,(Press ESC to exit)")
+        draw_button(restart_btn,"Restart (Press enter)")
+        draw_button(menu_btn,"Menu (Press M to open M)")
+        draw_button(quit_btn,"Quit (Press ESC to exit)")
         title=big_font.render("Game Over",True,(255,255,255))
-        screen.blit(title,title.get_rect(center=(COLS*CELL//2,175)))
+        screen.blit(title,title.get_rect(center=(WINDOW//2,175)))
     if state=="paused":
         overlay=pygame.Surface((WINDOW,WINDOW))
         overlay.set_alpha(120)
