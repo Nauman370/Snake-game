@@ -3,7 +3,7 @@ import random
 import math
 
 pygame.init()
-WINDOW=600
+WINDOW=576
 COLS=ROWS=20
 CELL=WINDOW//COLS
 fps=10
@@ -40,19 +40,20 @@ def draw_background():
             pygame.draw.rect(screen,color,(col*CELL,row*CELL,CELL,CELL))
 state="menu"
 SPEEDS={"slow":8,"normal_s":10,"fast":14,"faster":18,"fastest":22}
-GRIDS={"small":18,"normal_g":24,"big":30,"bigger":36,"biggest":40}
+GRIDS={"small":18,"normal_g":24,"big":32,"bigger":36,"biggest":48}
 PRESETS={
-    "Easiest":("slow","biggest"),
-    "EZ_PZ":("slow","small"),
-    "EZ":("normal_s","small"),
-    "normal":("normal_s","normal_g"),
-    "abnormal":("fastest","normal_g"),
-    "HELP":("faster","small"),
-    "NUH Uh":("fastest","small")
+    "Easiest":("slow","biggest",True),
+    "EZ_PZ":("slow","small",True),
+    "EZ":("normal_s","small",True),
+    "normal":("normal_s","normal_g",False),
+    "abnormal":("fastest","normal_g",False),
+    "HELP":("faster","small",False),
+    "NUH Uh":("fastest","small",False)
 }
 sel_speed="normal_s"
 sel_grid="normal_g"
 wrap=False
+sel_wrap=False
 big_font=pygame.font.SysFont(None,56)
 tongue_Duration=450
 tongue_next=pygame.time.get_ticks()+random.randint(1500,4000)
@@ -134,11 +135,12 @@ def reset_game():
     state="playing"
 
 
-def start_game(speed_name,grid_name):
-    global COLS,ROWS,CELL,fps
+def start_game(speed_name,grid_name,wrap_on):
+    global COLS,ROWS,CELL,fps,wrap
     COLS=ROWS=GRIDS[grid_name]
     CELL=WINDOW//COLS
     fps=SPEEDS[speed_name]
+    wrap=wrap_on
     reset_game()
 
 def make_row(labels,y,w,gap):
@@ -193,9 +195,8 @@ def draw_menu():
         draw_button(rect,label,label==sel_speed)
     draw_text("Custom:Choose grid",315)
     for label, rect in grid_btns:
-
         draw_button(rect,label,label==sel_grid)
-    draw_button(wrap_btn,"Wrap-mode"+("ON"if wrap else "OFF"),wrap)
+    draw_button(wrap_btn,"Wrap-mode"+("ON" if sel_wrap else "OFF"),sel_wrap)
     draw_button(start_btn,"Start Custom")
 
 
@@ -243,9 +244,9 @@ while running:
                         if rect.collidepoint(event.pos):
                             sel_grid=label
                     if start_btn.collidepoint(event.pos):
-                        start_game(sel_speed,sel_grid)
+                        start_game(sel_speed,sel_grid,sel_wrap)
                     if wrap_btn.collidepoint(event.pos):
-                        wrap=not wrap
+                        sel_wrap=not sel_wrap
             elif state=="gameover":
                 if restart_btn.collidepoint(event.pos):
                     reset_game()
@@ -269,10 +270,9 @@ while running:
             moved_snake=(moved_snake[0]%COLS,moved_snake[1]%ROWS)
             hit_wall=False
         else:
-            hit_wall=not(0<=moved_snake[0]<COLS,moved_snake[1]<ROWS)
+            hit_wall=not(0<=moved_snake[0]<COLS and 0<=moved_snake[1]<ROWS)
         hit_self=moved_snake in snake
         if (hit_wall or hit_self) is True:
-            
             state="gameover"
         else:
             snake.insert(0,moved_snake)
