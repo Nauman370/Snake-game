@@ -52,6 +52,7 @@ PRESETS={
 }
 sel_speed="normal_s"
 sel_grid="normal_g"
+wrap=False
 big_font=pygame.font.SysFont(None,56)
 tongue_Duration=450
 tongue_next=pygame.time.get_ticks()+random.randint(1500,4000)
@@ -169,6 +170,7 @@ preset_btns=preset_row1+preset_row2
 speed_btns=make_row(list(SPEEDS),245,100,10)
 grid_btns=make_row(list(GRIDS),340,105,8)
 start_btn=pygame.Rect(WINDOW//2-120,430,240,44)
+wrap_btn=pygame.Rect(WINDOW//2-120,388,240,36)
 restart_btn=pygame.Rect(WINDOW//2-150,310,300,44)
 menu_btn=pygame.Rect(WINDOW//2-150,365,300,44)
 quit_btn=pygame.Rect(WINDOW//2-150,420,300,44)
@@ -191,7 +193,9 @@ def draw_menu():
         draw_button(rect,label,label==sel_speed)
     draw_text("Custom:Choose grid",315)
     for label, rect in grid_btns:
+
         draw_button(rect,label,label==sel_grid)
+    draw_button(wrap_btn,"Wrap-mode"+("ON"if wrap else "OFF"),wrap)
     draw_button(start_btn,"Start Custom")
 
 
@@ -240,6 +244,8 @@ while running:
                             sel_grid=label
                     if start_btn.collidepoint(event.pos):
                         start_game(sel_speed,sel_grid)
+                    if wrap_btn.collidepoint(event.pos):
+                        wrap=not wrap
             elif state=="gameover":
                 if restart_btn.collidepoint(event.pos):
                     reset_game()
@@ -259,7 +265,11 @@ while running:
         snk_x,snk_y=snake[0]
         dir_x,dir_y= direction
         moved_snake=(snk_x+dir_x,snk_y+dir_y)
-        hit_wall=not(0<=moved_snake[0]<COLS and 0 <=moved_snake[1]<ROWS)
+        if wrap:
+            moved_snake=(moved_snake[0]%COLS,moved_snake[1]%ROWS)
+            hit_wall=False
+        else:
+            hit_wall=not(0<=moved_snake[0]<COLS,moved_snake[1]<ROWS)
         hit_self=moved_snake in snake
         if (hit_wall or hit_self) is True:
             
