@@ -30,13 +30,14 @@ def food_snake():
 food=food_snake()
 running=True
 def draw_background():
-    screen.fill((20,40,20))
+    theme=Board_colors[sel_board]
+    screen.fill(theme["border"])
     for col in range(COLS):
         for row in range(ROWS):
             if (col+row)%2==0:
-                color=(120,200,90)
+                color=theme["light"]
             else:
-                color=(105,185,80)
+                color=theme["dark"]
             pygame.draw.rect(screen,color,(col*CELL,row*CELL,CELL,CELL))
 state="menu"
 SPEEDS={"slow":8,"normal_s":10,"fast":14,"faster":18,"fastest":22}
@@ -202,6 +203,8 @@ preset_row2=make_row(names[4:],155,130,10)
 preset_btns=preset_row1+preset_row2
 speed_btns=make_row(list(SPEEDS),245,100,10)
 grid_btns=make_row(list(GRIDS),340,105,8)
+snake_btn=pygame.Rect(WINDOW//2-210,490,200,36)
+board_btn=pygame.Rect(WINDOW//2+10,490,200,36)
 start_btn=pygame.Rect(WINDOW//2-120,430,240,44)
 wrap_btn=pygame.Rect(WINDOW//2-120,388,240,36)
 restart_btn=pygame.Rect(WINDOW//2-150,310,300,44)
@@ -215,6 +218,9 @@ Key_Dir={
     pygame.K_LEFT:(-1,0),pygame.K_a:(-1,0),
     pygame.K_RIGHT:(1,0),pygame.K_d:(1,0),
 }
+def next_key(d,current):
+    keys=list(d)
+    return keys[(keys.index(current)+1)%len(keys)]
 def draw_menu():
     screen.fill((30,60,30))
     draw_text("SNAKE",50,big_font)
@@ -227,7 +233,9 @@ def draw_menu():
     draw_text("Custom:Choose grid",315)
     for label, rect in grid_btns:
         draw_button(rect,label,label==sel_grid)
-    draw_button(wrap_btn,"Wrap-mode"+("ON" if sel_wrap else "OFF"),sel_wrap)
+    draw_button(snake_btn,"Snake-color:" +sel_snake)
+    draw_button(board_btn,"Board-color:"+sel_board)
+    draw_button(wrap_btn,"Wrap-mode:"+ ("ON" if sel_wrap else "OFF"),sel_wrap)
     draw_button(start_btn,"Start Custom")
 
 
@@ -260,8 +268,6 @@ while running:
                     reset_game()
                 elif event.key==pygame.K_m:
                     state="menu"
-                elif event.key==pygame.K_h:
-                    show_controls=not show_controls
             elif state=="paused" and event.key==pygame.K_m:
                 state="menu"
 
@@ -282,6 +288,10 @@ while running:
                         start_game(sel_speed,sel_grid,sel_wrap)
                     if wrap_btn.collidepoint(event.pos):
                         sel_wrap=not sel_wrap
+                    if snake_btn.collidepoint(event.pos):
+                        sel_snake=next_key(Snakes_colors,sel_snake)
+                    if board_btn.collidepoint(event.pos):
+                        sel_board=next_key(Board_colors,sel_board)
             elif state=="gameover":
                 if restart_btn.collidepoint(event.pos):
                     reset_game()
@@ -338,13 +348,15 @@ while running:
     if state=="playing":
         stripe_phase=(stripe_phase+4)%CELL
 
+    skin=Snakes_colors[sel_snake]
+
     for i,(x,y) in enumerate(snake):
         if i==0:
-            color=(30,90,200)
+            color=skin["head"]
         elif i%2==0:
-            color=(50,130,230)
+            color=skin["a"]
         else:
-            color=(35,105,235)
+            color=skin["b"]
         pygame.draw.rect(screen,color,(x*CELL+1,y*CELL+1,CELL-2,CELL-2),border_radius=3)
         if i==0:
              
@@ -356,10 +368,10 @@ while running:
              tip=(cx+ax*CELL*0.45,cy+ay*CELL*0.45)
              back_a=(cx-ax*s+qx*s,cy-ay*s+qy*s)
              back_b=(cx-ax*s-qx*s,cy-ay*s-qy*s)
-             pygame.draw.polygon(screen,(200,42,129),[tip,back_a,back_b])
+             pygame.draw.polygon(screen,skin["accent"],[tip,back_a,back_b])
         if i>0:
             prev_x,prev_y=snake[i-1]
-            stripe=[200,42,129]
+            stripe=skin["accent"]
             p=max(1,stripe_phase)
             w=min(3,CELL-1-p)
             if w>0:
