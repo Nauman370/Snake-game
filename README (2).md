@@ -4,20 +4,13 @@ A snake game written in Python with pygame, made for Hack Club's **Terra** chall
 It started as a plain green square on a black window and grew into a full game with a
 difficulty menu, wrap-around mode, bonus fruits, snake skins and board themes.
 
-![Gameplay](screenshots/gameplay.png)
-
-![Menu](screenshots/menu.png)
-
 ## Download and play
 
-**Windows:** get `SnakeGame.exe` from the [latest release](PASTE-YOUR-RELEASE-LINK-HERE)
-and double-click it. Nothing needs to be installed.
+**Windows:** get `SnakeGame.exe` from the [latest release] and double-click it. Nothing needs to be installed.
 
 > Windows may show a "Windows protected your PC" warning because the app is not code-signed.
 > Click **More info**, then **Run anyway**. All of the source code is in this repository,
 > so you can read exactly what it does or run it yourself (see below).
-
-## Features
 
 ### Difficulty menu
 - **7 presets:** Easiest, EZ_PZ, EZ, normal, abnormal, HELP and NUH Uh.
@@ -68,59 +61,6 @@ python Snake.py
 (`pygame-ce` is the community edition of pygame. It is used the same way, with
 `import pygame`, and it installs more reliably on new Python versions.)
 
-## Build the .exe yourself
-
-```bash
-pip install pyinstaller
-python -m PyInstaller --onefile --windowed --name SnakeGame Snake.py
-```
-
-The finished file is `dist/SnakeGame.exe`.
-
-## How it works
-
-- **The snake is just a list of grid positions**, for example `[(10, 10), (10, 9), (10, 8)]`,
-  with the head first. Each move adds a new head and removes the tail. Growing means
-  skipping the removal.
-- **Game states:** the main loop checks a `state` variable (`menu`, `playing`, `paused`,
-  `gameover`) and only runs the game logic while it is `playing`.
-- **Input queue:** key presses are stored in a small queue and used one per move. Without it,
-  pressing two keys inside one frame could turn the snake back into its own neck.
-- **Settings are data.** Presets, speeds, grid sizes, fruits, snake skins and board themes
-  are all dictionaries, so adding a new one is a small change.
-- **Wrap-around** uses the remainder operator: `x % columns` brings a position that has left
-  one edge back in on the other side.
-- **Fixed window, variable cell size.** The window is always 576x576 pixels. The grid sizes
-  were chosen so 576 divides evenly by each of them, so the board always fills the window.
-- **Bonus fruit timers count frames,** not milliseconds, so they freeze when the game is paused.
-
-## What I learned
-
-<!-- Rewrite this section in your own words before you publish. -->
-Building this taught me how a game loop works: check input, update, draw, repeat. I learned
-to think of game state as data and the screen as a picture of that data, and to use a state
-variable to switch between the menu, the game, the pause screen and game over. I got
-comfortable with lists, tuples and dictionaries, and with grid coordinates versus pixel
-coordinates. A lot of my time went into debugging: missing commas and brackets, `=` versus
-`==`, indentation that put code in the wrong block, and a bug where two quick key presses let
-the snake reverse into itself.
-
 ## AI disclosure
 
-<!-- Check this is accurate for you and edit it, then keep it honest. -->
-I used Claude as a tutor. It explained pygame and Python concepts and showed example code for
-many features, which I typed in myself, adapted and debugged. It also helped me find the
-cause of errors. The design decisions were mine, including the preset names and which speed
-and grid size each one uses, how the bonus fruits score and grow the snake, the colors of the
-skins and boards, the controls strip, and which features to add next.
-
-## Ideas for later
-
-- High scores saved to a file for each difficulty
-- Sound effects
-- A browser version
-
-## Credits
-
-Made with Python and [pygame-ce](https://pyga.me), as part of
-[Hack Club](https://hackclub.com) Terra.
+I used AI for debugging at some points. I made most of it myself. I learnt how to make a game then implemented that and made the game.at points I got stuck and the problem didnt go away no matter what so I used AI and it helped me fix. other than that no AI was used 
